@@ -206,13 +206,11 @@ namespace WindowsApiWraperTemplate
             if (windowsList.Count == 0)
                 return;
 
-            Screen screen = null;
+            Screen screen;
+            screen = Screen.FromHandle(windowsList.ElementAt(0));
 
-            for (int i = 0; i < windowsList.Count; i++)
-            {
-                screen = Screen.FromHandle(windowsList.ElementAt(0));
-                break;
-            }
+            if (screen == null)
+                return;
 
             for (int i = 0; i < windowsList.Count; i++)
             {
@@ -229,20 +227,21 @@ namespace WindowsApiWraperTemplate
 
         public static void windowsToWaterfall(List<IntPtr> windowsList)
         {
-            Screen screen = null;
-            GDI32.RECT firstAlt = new GDI32.RECT();
-            for (int i = 0; i < windowsList.Count; i++)
-            {
-                screen = Screen.FromHandle(windowsList.ElementAt(i));
-                GDI32.GetClientRect(windowsList.ElementAt(i), ref firstAlt);
-                break;
-            }
+            Screen screen;
+            GDI32.RECT firstWindow = new GDI32.RECT();
+
+            screen = Screen.FromHandle(windowsList.ElementAt(0));
+            if (screen == null)
+                return;
+
+            GDI32.GetClientRect(windowsList.ElementAt(0), ref firstWindow);
+           
 
             if (screen == null)
                 return;
 
-            int xShift = (screen.WorkingArea.Width - firstAlt.right - 3) / (windowsList.Count - 1);
-            int yShift = (screen.WorkingArea.Height - firstAlt.bottom - 26) / (windowsList.Count - 1);
+            int xShift = (screen.WorkingArea.Width - firstWindow.right - 3) / (windowsList.Count - 1);
+            int yShift = (screen.WorkingArea.Height - firstWindow.bottom - 26) / (windowsList.Count - 1);
 
             if (yShift > 110)
                 yShift = 80;
@@ -257,7 +256,7 @@ namespace WindowsApiWraperTemplate
                 if (isMinimized(windowsList.ElementAt(i)))
                     ShowWindow(windowsList.ElementAt(i), KeyCodes.SW_NORMAL);
 
-                moveWindow(windowsList.ElementAt(i), screen.WorkingArea.X + screen.WorkingArea.Width - firstAlt.right - j * xShift, screen.WorkingArea.Y + j * yShift);
+                moveWindow(windowsList.ElementAt(i), screen.WorkingArea.X + screen.WorkingArea.Width - firstWindow.right - j * xShift, screen.WorkingArea.Y + j * yShift);
                 SetForegroundWindow(windowsList.ElementAt(i));
                 j++;
             }
